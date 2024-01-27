@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Your Name">
+<meta name="author" content="Jonathan Gan wg18">
 
 <title>Lab 3: Depth-Damage Models</title>
 <style>
@@ -58,7 +58,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="template_files/libs/clipboard/clipboard.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="template_files/libs/clipboard/clipboard.min.js"></script>
 <script src="template_files/libs/quarto-html/quarto.js"></script>
 <script src="template_files/libs/quarto-html/popper.min.js"></script>
 <script src="template_files/libs/quarto-html/tippy.umd.min.js"></script>
@@ -68,6 +68,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="template_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="template_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="template_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 </head>
@@ -105,7 +108,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Your Name </p>
+             <p>Jonathan Gan wg18 </p>
           </div>
   </div>
     
@@ -124,7 +127,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div id="3a0fcb4c" class="cell" data-execution_count="1">
+<div id="0c405f3c" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource julia number-lines code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">using</span> <span class="bu">CSV</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="im">using</span> <span class="bu">DataFrames</span></span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="im">using</span> <span class="bu">DataFramesMeta</span></span>
@@ -138,6 +141,295 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <section id="site-information" class="level1">
 <h1>Site information</h1>
+<div id="e7e09697" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="annotated-cell-2"><pre class="sourceCode numberSource julia code-annotation-code number-lines code-with-copy"><code class="sourceCode julia"><span id="annotated-cell-2-1"><a href="#annotated-cell-2-1"></a>haz_fl_dept <span class="op">=</span> CSV.<span class="fu">read</span>(<span class="st">"data/haz_fl_dept.csv"</span>, DataFrame)</span>
+<span id="annotated-cell-2-2"><a href="#annotated-cell-2-2"></a><span class="fu">first</span>(haz_fl_dept, <span class="fl">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div><div style="float: left;"><span>3×52 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Column1</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Occupancy</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">DmgFnId</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Source</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Description</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft04m</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft03m</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft02m</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft01m</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft00</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft01</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft02</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft03</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft04</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft05</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft06</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft07</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft08</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft09</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft10</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft11</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft12</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft13</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft14</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft15</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft16</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft17</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft18</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft19</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft20</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft21</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft22</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft23</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft24</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Comment</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft00_5</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft01_5</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft02_5</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft03_5</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft04_5</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft05_5</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft06_5</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft07_5</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft08_5</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft09_5</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft10_5</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft11_5</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft12_5</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ft13_5</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Source_Table</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Occupy_Class</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Cover_Class</th>
+</tr>
+<tr class="odd subheader headerLastRow">
+<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String7">String7</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String31">String31</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Union{Missing, String}">String?</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Union{Missing, String}">String?</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String3">String3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String31">String31</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String15">String15</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String15">String15</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">RES1</td>
+<td style="text-align: right;">183</td>
+<td style="text-align: left;">USACE - Wilmington</td>
+<td style="text-align: left;">two story, Pile foundation, structure</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">4</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">29</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">35</td>
+<td style="text-align: right;">37</td>
+<td style="text-align: left;">40</td>
+<td style="text-align: left;">44</td>
+<td style="text-align: left;">48</td>
+<td style="text-align: left;">51</td>
+<td style="text-align: left;">55</td>
+<td style="text-align: left;">57</td>
+<td style="text-align: left;">60</td>
+<td style="text-align: left;">62</td>
+<td style="text-align: left;">65</td>
+<td style="text-align: left;">68</td>
+<td style="text-align: left;">78</td>
+<td style="text-align: left;">89</td>
+<td style="text-align: left;">100</td>
+<td style="text-align: left;">100</td>
+<td style="text-align: left; font-style: italic;">missing</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">flBldgStructDmgFn</td>
+<td style="text-align: left;">RES</td>
+<td style="text-align: left;">Bldg</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">RES1</td>
+<td style="text-align: right;">184</td>
+<td style="text-align: left;">USACE - Wilmington</td>
+<td style="text-align: left;">two story, Structure</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">29</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: left;">40</td>
+<td style="text-align: left;">43</td>
+<td style="text-align: left;">47</td>
+<td style="text-align: left;">50</td>
+<td style="text-align: left;">54</td>
+<td style="text-align: left;">57</td>
+<td style="text-align: left;">60</td>
+<td style="text-align: left;">62</td>
+<td style="text-align: left;">65</td>
+<td style="text-align: left;">68</td>
+<td style="text-align: left;">71</td>
+<td style="text-align: left;">74</td>
+<td style="text-align: left;">77</td>
+<td style="text-align: left;">77</td>
+<td style="text-align: left; font-style: italic;">missing</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">flBldgStructDmgFn</td>
+<td style="text-align: left;">RES</td>
+<td style="text-align: left;">Bldg</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">RES1</td>
+<td style="text-align: right;">105</td>
+<td style="text-align: left;">FIA</td>
+<td style="text-align: left;">one floor, no basement, Structure, A-Zone</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">28</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: right;">43</td>
+<td style="text-align: right;">43</td>
+<td style="text-align: right;">45</td>
+<td style="text-align: right;">46</td>
+<td style="text-align: left;">47</td>
+<td style="text-align: left;">47</td>
+<td style="text-align: left;">49</td>
+<td style="text-align: left;">50</td>
+<td style="text-align: left;">50</td>
+<td style="text-align: left;">50</td>
+<td style="text-align: left;">51</td>
+<td style="text-align: left;">51</td>
+<td style="text-align: left;">52</td>
+<td style="text-align: left;">52</td>
+<td style="text-align: left;">53</td>
+<td style="text-align: left;">53</td>
+<td style="text-align: left;">54</td>
+<td style="text-align: left;">54</td>
+<td style="text-align: left; font-style: italic;">missing</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">flBldgStructDmgFn</td>
+<td style="text-align: left;">RES</td>
+<td style="text-align: left;">Bldg</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
 </section>
 <section id="depth-damage" class="level1">
 <h1>Depth-Damage</h1>
