@@ -57,13 +57,98 @@ Plots.default(; margin=6Plots.mm)
 ```
 
 # Site information
-```{julia}
-haz_fl_dept = CSV.read("data/haz_fl_dept.csv", DataFrame)
-first(haz_fl_dept, 3) # <1>
-```
+1. Gauge: Galveston Pier 21
+"near" = within 1000 metres of the gauge
+Building chosen: Galveston Art Centre, 200m away from the gauge
+Elevation: 5.22 feet
 
 # Depth-Damage
+2. Depth damage curve chosen: column1 = 211, USACE - Galveston: Average Retail: Structure. The Galveston Art Centre is a block of retail buildings on The Strand housing museums, stores, and other commercial functions. Therefore, this depth damage curve is an appropriate curve to model for the chosen building. 
+```{julia}
+haz_fl_dept = CSV.read("data/haz_fl_dept.csv", DataFrame)
+include("depthdamage.jl")
+row = @rsubset(
+    haz_fl_dept, :Description == "Average Retail, Structure"
+)[
+    1, :,
+]
+dd = DepthDamageData(row)
+fieldnames(typeof(dd))
+scatter(
+    dd.depths,
+    dd.damages;
+    xlabel="Flood Depth at Building",
+    ylabel="Damage (%)",
+    label="$(dd.description) ($(dd.source))",
+    legend=:bottomright,
+    size=(700, 500),
+)
+itp = let
+    depth_ft = ustrip.(u"ft", dd.depths)
+    damage_frac = dd.damages
+    Interpolations.LinearInterpolation(
+        depth_ft,
+        damage_frac;
+        extrapolation_bc=Interpolations.Flat(),
+    )
+end
 
+let
+    dmg_fn(x) = itp(ustrip.(u"ft", x))
+    dmg_fn.([3.1u"ft", 2.2u"m", 91.4u"inch"])
+end
+
+function get_depth_damage_function(
+    depth_train::Vector{<:T}, dmg_train::Vector{<:AbstractFloat}
+) where {T<:Unitful.Length}
+
+    # interpolate
+    depth_ft = ustrip.(u"ft", depth_train)
+    interp_fn = Interpolations.LinearInterpolation(
+        depth_ft,
+        dmg_train;
+        extrapolation_bc=Interpolations.Flat(),
+    )
+
+    damage_fn = function (depth::T2) where {T2<:Unitful.Length}
+        return interp_fn(ustrip.(u"ft", depth))
+    end
+    return damage_fn
+end
+damage_fn = get_depth_damage_function(dd.depths, dd.damages)
+p = let
+    depths = uconvert.(u"ft", (-10.0u"ft"):(1.0u"inch"):(30.0u"ft"))
+    damages = damage_fn.(depths)
+    scatter(
+        depths,
+        damages;
+        xlabel="Flood Depth",
+        ylabel="Damage (%)",
+        label="$(dd.description) ($(dd.source))",
+        legend=:bottomright,
+        size=(800, 400),
+        linewidth=2,
+    )
+end
+p
+
+
+```
 # Expected annual damages
+```{julia}
+gauge_dist = GeneralizedExtremeValue(5, 1.5, 0.1)
+quantile.(gauge_dist, [0.5, 0.9, 0.99, 0.999])
+p1 = plot(
+    gauge_dist;
+    label="Gauge Distribution",
+    xlabel="Water Level (ft)",
+    ylabel="Probability Density",
+    legend=:topright,
+    linewidth=2,
+)
+
+
+
+```
 
 # Discussion
