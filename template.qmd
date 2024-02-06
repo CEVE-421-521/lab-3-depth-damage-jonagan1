@@ -52,6 +52,7 @@ using Interpolations
 using Plots
 using StatsPlots
 using Unitful
+using Random
 
 Plots.default(; margin=6Plots.mm)
 ```
@@ -137,17 +138,7 @@ p
 # Expected annual damages
 ```{julia}
 gauge_dist = GeneralizedExtremeValue(5, 1.5, 0.1)
-quantile.(gauge_dist, [0.5, 0.9, 0.99, 0.999])
-p1 = plot(
-    gauge_dist;
-    label="Gauge Distribution",
-    xlabel="Water Level (ft)",
-    ylabel="Probability Density",
-    legend=:topright,
-    linewidth=2,
-)
-
-
+hazards = rand(gauge_dist, 1000000)
 
 ```
 
