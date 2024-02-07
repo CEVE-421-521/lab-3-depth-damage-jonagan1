@@ -134,12 +134,18 @@ end
 p
 
 
+
 ```
 # Expected annual damages
 ```{julia}
 gauge_dist = GeneralizedExtremeValue(5, 1.5, 0.1)
-hazards = rand(gauge_dist, 1000000)
-
+hazard_values =rand(gauge_dist,1000000)*1u"ft"
+damages = damage_fn.(hazard_values)
+avg_damages = sum(damages) / 1000000
 ```
 
 # Discussion
+Depth damage curve: From the plotted depth damage curve, there are no predicted damages for any flood depths below 0m, which is indicative of the validity of the depth damage function within a certain range, and the function not being valid if the depth is negative makes sense since it is not possible for a flood to be less than 0. From 0 ft to to about 25 ft, there seems to be a direct correlation that is roughly linear between depth and damage, and there is an upper bound for the maximum damage caused by a given flood at ~80%. 
+
+Expected Annual Damages = 23.9%. 
+The expected average damage to the Galveston Art Center a year is 23.9%.
