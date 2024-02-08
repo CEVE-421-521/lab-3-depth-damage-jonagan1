@@ -25,19 +25,19 @@ format:
 
     # YOU CAN DO PDF OR DOCX BUT NOT BOTH
     # IF YOU UNCOMMENT docx, COMMENT OR DELETE pdf
-    pdf:
-        documentclass: article
-        fontsize: 11pt
-        geometry:
-            - margin=1in  
+    # pdf:
+   #     documentclass: article
+  #      fontsize: 11pt
+  #      geometry:
+  #          - margin=1in  
+   #     number-sections: true
+   #     code-line-numbers: true
+
+    docx: 
+        toc: true
+        fig-format: png
         number-sections: true
         code-line-numbers: true
-
-    #docx: 
-    #    toc: true
-    #    fig-format: png
-    #    number-sections: true
-    #    code-line-numbers: true
 
 date-format: "ddd., MMM. D"
 ---
@@ -58,10 +58,7 @@ Plots.default(; margin=6Plots.mm)
 ```
 
 # Site information
-1. Gauge: Galveston Pier 21
-"near" = within 1000 metres of the gauge
-Building chosen: Galveston Art Centre, 200m away from the gauge
-Elevation: 5.22 feet
+1. The gauge chosen is Galveston Pier 21. I define near as the building being located within 1km of the gauge. The building that I have chosen is Galveston Art Center, which is located 200 meters from the gauge. The elevation of the building is 5.22ft. 
 
 # Depth-Damage
 2. Depth damage curve chosen: column1 = 211, USACE - Galveston: Average Retail: Structure. The Galveston Art Centre is a block of retail buildings on The Strand housing museums, stores, and other commercial functions. Therefore, this depth damage curve is an appropriate curve to model for the chosen building. 
@@ -144,8 +141,84 @@ damages = damage_fn.(hazard_values)
 avg_damages = sum(damages) / 1000000
 ```
 
+# Using Another Depth Damage Function
+3. There are other depth damage curves that may apply to the Galveston Art Center. For instance, the hazard data provided by USACE - Galveston also has a depth-damage function for the structure of gift stores.
+
+```{julia}
+haz_fl_dept = CSV.read("data/haz_fl_dept.csv", DataFrame)
+include("depthdamage.jl")
+row = @rsubset(
+    haz_fl_dept, :Description == "Gift Shop, structure"
+)[
+    1, :,
+]
+dd = DepthDamageData(row)
+fieldnames(typeof(dd))
+scatter(
+    dd.depths,
+    dd.damages;
+    xlabel="Flood Depth at Building",
+    ylabel="Damage (%)",
+    label="$(dd.description) ($(dd.source))",
+    legend=:bottomright,
+    size=(700, 500),
+)
+itp = let
+    depth_ft = ustrip.(u"ft", dd.depths)
+    damage_frac = dd.damages
+    Interpolations.LinearInterpolation(
+        depth_ft,
+        damage_frac;
+        extrapolation_bc=Interpolations.Flat(),
+    )
+end
+
+let
+    dmg_fn(x) = itp(ustrip.(u"ft", x))
+    dmg_fn.([3.1u"ft", 2.2u"m", 91.4u"inch"])
+end
+
+function get_depth_damage_function(
+    depth_train::Vector{<:T}, dmg_train::Vector{<:AbstractFloat}
+) where {T<:Unitful.Length}
+
+    # interpolate
+    depth_ft = ustrip.(u"ft", depth_train)
+    interp_fn = Interpolations.LinearInterpolation(
+        depth_ft,
+        dmg_train;
+        extrapolation_bc=Interpolations.Flat(),
+    )
+
+    damage_fn = function (depth::T2) where {T2<:Unitful.Length}
+        return interp_fn(ustrip.(u"ft", depth))
+    end
+    return damage_fn
+end
+damage_fn = get_depth_damage_function(dd.depths, dd.damages)
+p = let
+    depths = uconvert.(u"ft", (-10.0u"ft"):(1.0u"inch"):(30.0u"ft"))
+    damages = damage_fn.(depths)
+    scatter(
+        depths,
+        damages;
+        xlabel="Flood Depth",
+        ylabel="Damage (%)",
+        label="$(dd.description) ($(dd.source))",
+        legend=:bottomright,
+        size=(800, 400),
+        linewidth=2,
+    )
+end
+p
+
+```
+
+
 # Discussion
 Depth damage curve: From the plotted depth damage curve, there are no predicted damages for any flood depths below 0m, which is indicative of the validity of the depth damage function within a certain range, and the function not being valid if the depth is negative makes sense since it is not possible for a flood to be less than 0. From 0 ft to to about 25 ft, there seems to be a direct correlation that is roughly linear between depth and damage, and there is an upper bound for the maximum damage caused by a given flood at ~80%. 
 
 Expected Annual Damages = 23.9%. 
 The expected average damage to the Galveston Art Center a year is 23.9%.
+
+Comparing the average retail structure depth damage curve to the gift store curve, we see that both curves have similar maximum and minimum bounds, and they both are largely linear between 0 and 20 feet. However, the slope of the gift shop curve seems to vary more between points, and that may be indicative of the smaller data set used to create this depth damage curve compared to the average retail structure curve. Because the category is more specific, then there are most likely less data that is used to create the curve, and thus larger trends that are extrapolated from this data may not be entirely accurate and be skewed by scenarios and factors that affect individual buildings. 
